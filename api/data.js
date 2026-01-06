@@ -1,30 +1,16 @@
-const puppeteer = require("puppeteer");
-const { execSync } = require("child_process");
-
-function getChromiumPath() {
-  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
-    return process.env.PUPPETEER_EXECUTABLE_PATH;
-  }
-  try {
-    return execSync("which chromium").toString().trim();
-  } catch {
-    return puppeteer.executablePath();
-  }
-}
+const chromium = require("@sparticuz/chromium");
+const puppeteer = require("puppeteer-core");
 
 module.exports = async (req, res) => {
   let browser = null;
 
   try {
+
     browser = await puppeteer.launch({
-      headless: "new",
-      executablePath: getChromiumPath(),
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-gpu",
-        "--disable-dev-shm-usage"
-      ]
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless
     });
 
     const page = await browser.newPage();
@@ -43,6 +29,7 @@ module.exports = async (req, res) => {
     await new Promise(r => setTimeout(r, 6000));
 
     const data = await page.evaluate(() => {
+
       function getBox(title) {
         const headers = Array.from(document.querySelectorAll("div"))
           .filter(d => d.innerText && d.innerText.includes(title));
@@ -84,14 +71,15 @@ module.exports = async (req, res) => {
       };
     });
 
-    res.status(200).json({
+    res.json({
       status: "ok",
       data
     });
-  } catch (error) {
-    res.status(500).json({
+
+  } catch (err) {
+    res.json({
       status: "error",
-      error: error.message
+      error: err.message
     });
   } finally {
     if (browser) {
