@@ -2,24 +2,27 @@ const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-core");
 
 module.exports = async (req, res) => {
-  let browser = null;
+
+  let browser;
 
   try {
 
+    const executablePath = await chromium.executablePath();
+
     browser = await puppeteer.launch({
-      args: chromium.args,
+      executablePath,
+      args: [
+        ...chromium.args,
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--no-sandbox",
+        "--disable-setuid-sandbox"
+      ],
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless
+      headless: true
     });
 
     const page = await browser.newPage();
-
-    await page.setViewport({
-      width: 390,
-      height: 844,
-      deviceScaleFactor: 2
-    });
 
     await page.goto("http://anjujewellery.in/", {
       waitUntil: "networkidle2",
@@ -65,27 +68,15 @@ module.exports = async (req, res) => {
         next: {
           gold: getBox("GOLD NEXT"),
           silver: getBox("SILVER NEXT")
-        },
-        tables: Array.from(document.querySelectorAll("table"))
-          .map(t => t.outerHTML)
+        }
       };
     });
 
-    res.json({
-      status: "ok",
-      data
-    });
+    res.json({ status: "ok", data });
 
   } catch (err) {
-    res.json({
-      status: "error",
-      error: err.message
-    });
+    res.json({ status: "error", error: err.message });
   } finally {
-    if (browser) {
-      try {
-        await browser.close();
-      } catch {}
-    }
+    if (browser) await browser.close().catch(() => {});
   }
 };
