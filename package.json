@@ -2,8 +2,9 @@
   "name": "ambica-live",
   "version": "1.0.0",
   "type": "commonjs",
+  "license": "MIT",
   "dependencies": {
-    "puppeteer-core": "21.3.8",
-    "@sparticuz/chromium": "120.0.0"
+    "@sparticuz/chromium": "120.0.0",
+    "puppeteer-core": "21.3.8"
   }
 }
