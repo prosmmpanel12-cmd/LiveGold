@@ -4,7 +4,7 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
-    "@sparticuz/chromium": "120.0.0",
+    "@sparticuz/chromium": "119.0.0",
     "puppeteer-core": "21.3.8"
   }
 }
