@@ -2,6 +2,7 @@ const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-core");
 
 module.exports = async (req, res) => {
+
   let browser;
 
   try {
@@ -10,8 +11,7 @@ module.exports = async (req, res) => {
       executablePath: await chromium.executablePath(),
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      headless: true,
-      ignoreHTTPSErrors: true
+      headless: true
     });
 
     const page = await browser.newPage();
@@ -52,6 +52,14 @@ module.exports = async (req, res) => {
           gold: getBox("GOLD SPOT"),
           silver: getBox("SILVER SPOT"),
           inr: getBox("INR SPOT")
+        },
+        futures: {
+          gold: getBox("GOLD FUTURE"),
+          silver: getBox("SILVER FUTURE")
+        },
+        next: {
+          gold: getBox("GOLD NEXT"),
+          silver: getBox("SILVER NEXT")
         }
       };
     });
@@ -59,8 +67,17 @@ module.exports = async (req, res) => {
     res.json({ status: "ok", data });
 
   } catch (err) {
-    res.json({ status: "error", error: err.message });
+
+    res.json({
+      status: "error",
+      error: err.message
+    });
+
   } finally {
-    if (browser) await browser.close().catch(() => {});
+
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
+
   }
 };
