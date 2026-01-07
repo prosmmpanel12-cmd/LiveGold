@@ -1,4 +1,7 @@
 {
+  "name": "ambica-live",
+  "version": "1.0.0",
+  "type": "commonjs",
   "dependencies": {
     "puppeteer-core": "21.3.8",
     "@sparticuz/chromium": "120.0.0"
